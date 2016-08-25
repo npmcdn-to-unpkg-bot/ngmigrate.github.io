@@ -41,47 +41,29 @@ Let's set up a simple Angular 1.x controller that exposes some data and properti
 It has a toggle to indicate whether a border should be shown, and a cycle to cycle through colors. 
 
 {% highlight javascript %}
-var ng = function (app) {
-  function Controller() {
-    this.toggle = false; 
-    this.idx = 0;
-    this.backgrounds = ['red', 'green', 'blue'];
-    this.borders = ['greenborder', 'redborder', 'blueborder'];
-    this.arr = [ this.backgrounds[1], this.borders[2] ];
-  }
+
+function Controller() {
+  this.toggle = false; 
+  this.idx = 0;
+  this.backgrounds = ['red', 'green', 'blue'];
+  this.borders = ['greenborder', 'redborder', 'blueborder'];
+  this.arr = [ this.backgrounds[1], this.borders[2] ];
+  this.currentBorder = this.borders[0];
+  this.currentBackground = this.backgrounds[0];
+}
     
-  app.controller('ctrl', Controller);
-};
-
-setTimeout(ng(angular.module('ngMigrate', [])), 0);
+angular.module('ngMigrate', [])
+  .controller('ctrl', Controller);
 {% endhighlight %}
 
-Next up we can expose the "current" border and background using read-only JavaScript properties:
-
-{% highlight javascript %}
-Object.defineProperty(Controller.prototype, 'background', {
-    enumerable: true,
-    configurable: false,
-    get: function () {
-      return this.backgrounds[this.idx];
-    }
-  });
-  
-  Object.defineProperty(Controller.prototype, 'border', {
-    enumerable: true,
-    configurable: false,
-    get: function () {
-      return this.borders[this.idx];
-    }
-  });
-{% endhighlight %}
-
-Finally we'll expose a method to cycle through: 
+In addition we'll expose a method to cycle through: 
 
 {% highlight javascript  %}
-  Controller.prototype.cycleAction = function () {
-    this.idx = (this.idx + 1) % this.backgrounds.length;
-  }
+Controller.prototype.cycleAction = function () {
+  this.idx = (this.idx + 1) % this.backgrounds.length;
+  this.currentBorder = this.borders[this.idx];
+  this.currentBackground = this.backgrounds[this.idx];
+}
 {% endhighlight %}
 
 ### HTML Markup 
@@ -97,8 +79,8 @@ examples of string binding, and finally the array binding example.
       <input type="checkbox" ng-model='ctrl.toggle'/>Show Border
       <br/><br/>
       <div ng-class="{ 'red': true, 'greenborder' : ctrl.toggle }">Toggle</div>
-      <div ng-class="ctrl.background">BG</div>
-      <div ng-class="ctrl.border">Border</div>
+      <div ng-class="ctrl.currentBackground">BG</div>
+      <div ng-class="ctrl.currentBorder">Border</div>
       <div ng-class="ctrl.arr">Array</div>
     </section>
   </body>
@@ -117,30 +99,30 @@ bind to any DOM property that is exposed. This eliminates dozens of built-in dir
 ### The Angular 2 Component 
 
 First, we'll convert the controller code to a component. Note we can migrate it 
-almost "as is." The getters and setters are simplified by the TypeScript
-syntax.  
+almost "as is" and just move some properties out of the constructor.
 
 {% highlight typescript %}
 
 export class App {
+  
+  public toggle: boolean = false;
+  public idx: number = 0;
+  public backgrounds: string[] = ['red', 'green', 'blue']; 
+  public borders: string[] = ['greenborder', 'redborder', 'blueborder'];
+  public arr: string[];
+  public currentBackground: string;
+  public currentBorder: string;
+  
   constructor() {
-    this.toggle = false; 
-    this.idx = 0;
-    this.backgrounds = ['red', 'green', 'blue'];
-    this.borders = ['greenborder', 'redborder', 'blueborder'];
     this.arr = [ this.backgrounds[1], this.borders[2] ];
-  }
-  
-  get background(): string {
-    return this.backgrounds[this.idx];
-  }
-  
-  get border(): string {
-    return this.borders[this.idx];
+    this.currentBackground = this.backgrounds[0];
+    this.currentBorder = this.borders[0;]
   }
   
   public cycle(): void {
     this.idx = (this.idx + 1) % this.backgrounds.length;
+    this.currentBackground = this.backgrounds[this.idx];
+    this.currentBorder = this.borders[this.idx];
   }
 }
 
@@ -153,8 +135,8 @@ template binding syntax in Angular 2 to set the class. To bind to a DOM
 property, you simply wrap it in square braces, like this: 
 
 {% highlight html %}
-<div [class]="background">BG</div>
-<div [class]="border">Border</div>
+<div [class]="currentBackground">BG</div>
+<div [class]="currentBorder">Border</div>
 {% endhighlight %}
 
 Note that "background" and "border" are expressions evaluated against the component and 
