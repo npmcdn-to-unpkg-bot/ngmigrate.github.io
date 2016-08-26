@@ -17,7 +17,9 @@ are initialized by attributes.)
 <div class="contents" markdown="1">
 * [Angular 1.x](#angular-1x)
   * [Using ng-class](#using-ng-class)
-  * [HTML Markup](#html-markup)
+  * [ng-class and Strings](#ng-class-and-strings)
+  * [ng-class and Arrays](#ng-class-and-arrays)
+  * [ng-class and Objects](#ng-class-and-object)
   * [Final 1.x code](#final-1x-code)
 * [Angular 2](#angular-2)
   * [The Angular 2 Component](#the-angular-2-component)
@@ -66,11 +68,11 @@ Controller.prototype.cycleAction = function () {
 }
 {% endhighlight %}
 
-### HTML Markup 
+### ng-class and Strings
 
 The HTML markup defines the controller, binds to the toggle property and
-cycle function, and exposes the class in different ways: first with an object, next with
-examples of string binding, and finally the array binding example.
+cycle function, and exposes the class in different ways. The first way simply
+binds to a string that represents the class.
 
 {% highlight html %}
 <body ng-app="ngMigrate">
@@ -78,13 +80,30 @@ examples of string binding, and finally the array binding example.
       <button ng-click='ctrl.cycleAction()'>Cycle</button>
       <input type="checkbox" ng-model='ctrl.toggle'/>Show Border
       <br/><br/>
-      <div ng-class="{ 'red': true, 'greenborder' : ctrl.toggle }">Toggle</div>
       <div ng-class="ctrl.currentBackground">BG</div>
       <div ng-class="ctrl.currentBorder">Border</div>
-      <div ng-class="ctrl.arr">Array</div>
     </section>
   </body>
 {% endhighlight %}
+
+### ng-class and Arrays 
+
+It is possible to bind to an array. Each element of the array represents the string value
+of the class to be added. 
+
+{% highlight html %}
+<div ng-class="ctrl.arr">Array</div>
+{% endhighlight %}
+
+### ng-class and Object 
+
+Finally, for more complex logic you can specify an object. The keys (properties) on the object 
+represent classes, and the values are expressions that, when truthy, result in the class being 
+added, and when falsy result in the class being removed. 
+
+{% highlight html %}
+<div ng-class="{ 'red': true, 'greenborder' : ctrl.toggle }">Toggle</div>
+{% endhighlight %}    
 
 ### Final 1.x code
 
