@@ -130,25 +130,39 @@ export class App {
 
 ### String Binding 
 
-Now that the component is defined, we can take advantage of the
-template binding syntax in Angular 2 to set the class. To bind to a DOM
-property, you simply wrap it in square braces, like this: 
+The Angular 2 `ngClass` directive works the same as Angular 1. You simply wrap it in square 
+braces, like this:
+
+{% highlight html %}
+<div [ngClass]="currentBackground">BG</div>
+<div [ngClass]="currentBorder">Border</div>
+{% endhighlight %}
+
+Note that "background" and "border" are expressions evaluated against the component and 
+not string literals.
+
+Alternatively, you can take advantage of the fact that Angular 2 template binding allows binding directly
+to any DOM property without using a directive. This will work because `class` is a property on the DOM
+element: 
 
 {% highlight html %}
 <div [class]="currentBackground">BG</div>
 <div [class]="currentBorder">Border</div>
 {% endhighlight %}
 
-Note that "background" and "border" are expressions evaluated against the component and 
-not string literals.
 
 ### Array Binding 
 
-Property binding evaluates the expression and passes the result directly
-to the property. Therefore, binding to an array will not behave the same as 
-it did in Angular 1.x. Instead, you must either expose a method that decomposes 
-the array into a string with the classes separated by spaces, or use an expression
-like this: 
+Array binding works the same way in Angular 2 using the `ngClass` directive:
+
+{% highlight html %}
+<div [ngClass]="arr">Array</div>
+{% endhighlight %}
+
+Because property binding evaluates the expression and passes the result directly
+to the property, binding an array directly to the `class` property won't work. Instead, 
+you must either expose a method that decomposes the array into a string with the classes separated by 
+spaces, or use an expression like this that joins the array into a string: 
 
 {% highlight html %}
 <div [class]="arr.join(' ')">Array</div>
@@ -158,8 +172,15 @@ Notice the array is joined into a single spring with a space between each class.
 
 ### Multiple Expressions 
 
-For multiple expressions, instead of joining to an object, you can extend
-the property binding for the class to class names. When the associated expression is truthy,
+Angular 2 uses the same object syntax for the `ngClass` directive, allowing you to specify a set of
+classes as keys with a boolean value conditioning whether the class is added or removed: 
+
+{% highlight html %}
+<div [ngClass]="{ red: true, greenborder: toggle}">Toggle</div>
+{% endhighlight %}
+
+For multiple conditions when binding directly to the `class` property, instead of joining to an object, 
+you can extend the property binding for the class to class names. When the associated expression is truthy,
 the class is added. When the associated expression is falsy, the class is removed.
 
 {% highlight html %}
